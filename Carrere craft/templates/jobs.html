@@ -1,0 +1,751 @@
+{% extends "base_layout.html" %}
+
+{% block title %}Jobs - CareerCraft{% endblock %}
+
+{% block content %}
+<style>
+    .jobs-container {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 2rem;
+    }
+    
+    .filters-panel {
+        background: white;
+        border-radius: 20px;
+        padding: 1.5rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        height: fit-content;
+        position: sticky;
+        top: 20px;
+    }
+    
+    .filters-title {
+        font-size: 1.3rem;
+        color: #333;
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+    }
+    
+    .filter-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .filter-label {
+        display: block;
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+    
+    .filter-input {
+        width: 100%;
+        padding: 10px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 0.9rem;
+    }
+    
+    .filter-input:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+    
+    .filter-btn {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+        margin-bottom: 0.5rem;
+    }
+    
+    .filter-btn:hover {
+        transform: translateY(-2px);
+    }
+    
+    .clear-btn {
+        width: 100%;
+        padding: 10px;
+        background: white;
+        color: #667eea;
+        border: 2px solid #667eea;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .clear-btn:hover {
+        background: #f5f5f5;
+    }
+    
+    .jobs-panel {
+        min-height: 500px;
+    }
+    
+    .page-header {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+    
+    .page-title {
+        font-size: 2rem;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+    
+    .page-subtitle {
+        color: #666;
+        font-size: 1rem;
+    }
+    
+    .jobs-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 1.5rem;
+    }
+    
+    .job-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+        position: relative;
+    }
+    
+    .job-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(102, 126, 234, 0.3);
+    }
+    
+    .job-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 1rem;
+    }
+    
+    .job-icon {
+        font-size: 2.5rem;
+    }
+    
+    .job-badge {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+    }
+    
+    .match-badge {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        z-index: 10;
+        white-space: nowrap;
+    }
+    
+    .match-excellent {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        color: white;
+    }
+    
+    .match-good {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .match-fair {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+    }
+    
+    .match-low {
+        background: linear-gradient(135deg, #a8a8a8 0%, #7f7f7f 100%);
+        color: white;
+    }
+    
+    .match-none {
+        background: #f0f0f0;
+        color: #666;
+        font-size: 0.7rem;
+        padding: 6px 12px;
+    }
+    
+    .save-btn {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: white;
+        border: 2px solid #e0e0e0;
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 1.2rem;
+        transition: all 0.3s ease;
+    }
+    
+    .save-btn:hover {
+        border-color: #667eea;
+        transform: scale(1.1);
+    }
+    
+    .save-btn.saved {
+        background: #667eea;
+        border-color: #667eea;
+        color: white;
+    }
+    
+    .job-title {
+        font-size: 1.3rem;
+        color: #333;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        padding-right: 50px;
+        margin-top: 2.5rem;
+    }
+    
+    .job-company {
+        color: #667eea;
+        font-size: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .job-details {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+    }
+    
+    .job-detail {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        color: #666;
+        font-size: 0.9rem;
+    }
+    
+    .job-description {
+        color: #666;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+    
+    .apply-btn {
+        width: 100%;
+        padding: 10px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+    }
+    
+    .apply-btn:hover {
+        transform: scale(1.02);
+    }
+    
+    .loading {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+    
+    .loading-spinner {
+        font-size: 3rem;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+    
+    .empty-icon {
+        font-size: 5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .empty-title {
+        font-size: 1.5rem;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+    
+    .empty-text {
+        color: #666;
+    }
+    
+    .results-info {
+        background: white;
+        border-radius: 15px;
+        padding: 1rem 1.5rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        margin-bottom: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+    
+    .results-count {
+        color: #666;
+        font-size: 0.95rem;
+    }
+    
+    .view-saved-btn {
+        padding: 8px 16px;
+        background: white;
+        color: #667eea;
+        border: 2px solid #667eea;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .view-saved-btn:hover {
+        background: #667eea;
+        color: white;
+    }
+    
+    .pagination {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+    
+    .page-btn {
+        padding: 8px 16px;
+        background: white;
+        color: #667eea;
+        border: 2px solid #667eea;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .page-btn:hover:not(:disabled) {
+        background: #667eea;
+        color: white;
+    }
+    
+    .page-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    
+    .page-info {
+        color: #666;
+        font-size: 0.9rem;
+    }
+    
+    @media (max-width: 768px) {
+        .jobs-container {
+            grid-template-columns: 1fr;
+        }
+        
+        .filters-panel {
+            position: relative;
+            top: 0;
+        }
+    }
+</style>
+
+<div class="page-header">
+    <h1 class="page-title">🔍 Job Opportunities</h1>
+    <p class="page-subtitle">Find your dream career with real-time job listings</p>
+</div>
+
+<div class="jobs-container">
+    <!-- Left Panel: Filters -->
+    <div class="filters-panel">
+        <h3 class="filters-title">🎯 Filters</h3>
+        
+        <div class="filter-group">
+            <label class="filter-label">Job Title / Keywords</label>
+            <input type="text" id="queryInput" class="filter-input" placeholder="e.g. Software Engineer, Python Developer">
+        </div>
+        
+        <div class="filter-group">
+            <label class="filter-label">Location (India)</label>
+            <input type="text" id="locationInput" class="filter-input" placeholder="e.g. Bangalore, Mumbai, Delhi">
+        </div>
+        
+        <div class="filter-group">
+            <label class="filter-label">Min Salary (₹)</label>
+            <input type="number" id="salaryMinInput" class="filter-input" placeholder="e.g. 500000">
+        </div>
+        
+        <div class="filter-group">
+            <label class="filter-label">Max Salary (₹)</label>
+            <input type="number" id="salaryMaxInput" class="filter-input" placeholder="e.g. 2000000">
+        </div>
+        
+        <button class="filter-btn" onclick="searchJobs()">🔍 Search Jobs</button>
+        <button class="clear-btn" onclick="clearFilters()">Clear Filters</button>
+    </div>
+    
+    <!-- Right Panel: Jobs -->
+    <div class="jobs-panel">
+        <div class="results-info" id="resultsInfo" style="display: none;">
+            <span class="results-count" id="resultsCount">Loading jobs...</span>
+            <div class="pagination">
+                <button class="page-btn" id="prevBtn" onclick="previousPage()" disabled>← Previous</button>
+                <span class="page-info" id="pageInfo">Page 1</span>
+                <button class="page-btn" id="nextBtn" onclick="nextPage()">→ Next</button>
+            </div>
+            <button class="view-saved-btn" onclick="viewSavedJobs()">💾 View Saved Jobs</button>
+        </div>
+        
+        <div id="jobsContainer">
+            <div class="loading">
+                <div class="loading-spinner">⏳</div>
+                <h3 class="empty-title">Loading Jobs...</h3>
+                <p class="empty-text">Fetching the latest job opportunities for you</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentPage = 1;
+let totalResults = 0;
+let savedJobIds = new Set();
+
+// Load jobs on page load
+document.addEventListener('DOMContentLoaded', function() {
+    loadSavedJobIds();
+    
+    // Show welcome message - wait for manual search
+    const container = document.getElementById('jobsContainer');
+    container.innerHTML = `
+        <div class="empty-state">
+            <div class="empty-icon">🔍</div>
+            <h3 class="empty-title">Search for Jobs</h3>
+            <p class="empty-text">Enter job title, keywords, or location and click "Search Jobs"</p>
+        </div>
+    `;
+});
+
+function nextPage() {
+    currentPage++;
+    searchJobs(currentPage);
+    window.scrollTo(0, 0);
+}
+
+function previousPage() {
+    if (currentPage > 1) {
+        currentPage--;
+        searchJobs(currentPage);
+        window.scrollTo(0, 0);
+    }
+}
+
+function updatePagination() {
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const pageInfo = document.getElementById('pageInfo');
+    
+    prevBtn.disabled = currentPage === 1;
+    nextBtn.disabled = totalResults < 20; // Disable if less than full page
+    pageInfo.textContent = `Page ${currentPage}`;
+}
+
+// Load saved job IDs
+async function loadSavedJobIds() {
+    try {
+        const response = await fetch('/api/jobs/saved');
+        const data = await response.json();
+        savedJobIds = new Set(data.jobs.map(job => job.id));
+    } catch (error) {
+        console.error('Error loading saved jobs:', error);
+    }
+}
+
+// Search jobs with filters
+async function searchJobs(page = 1) {
+    const query = document.getElementById('queryInput').value;
+    const location = document.getElementById('locationInput').value;
+    const salaryMin = document.getElementById('salaryMinInput').value;
+    const salaryMax = document.getElementById('salaryMaxInput').value;
+    
+    const params = new URLSearchParams({
+        query: query,
+        location: location,
+        page: page
+    });
+    
+    if (salaryMin) params.append('salary_min', salaryMin);
+    if (salaryMax) params.append('salary_max', salaryMax);
+    
+    try {
+        const response = await fetch(`/api/jobs/search?${params}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            displayJobs(data.jobs, data.total_results);
+        } else {
+            showError(data.error);
+        }
+    } catch (error) {
+        showError('Failed to fetch jobs. Please try again.');
+        console.error('Error:', error);
+    }
+}
+
+// Display jobs in grid
+function displayJobs(jobs, total) {
+    const container = document.getElementById('jobsContainer');
+    const resultsInfo = document.getElementById('resultsInfo');
+    const resultsCount = document.getElementById('resultsCount');
+    
+    totalResults = jobs.length;
+    resultsInfo.style.display = 'flex';
+    resultsCount.textContent = `Found ${total.toLocaleString()} jobs (Page ${currentPage})`;
+    updatePagination();
+    
+    if (jobs.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">🔍</div>
+                <h3 class="empty-title">No Jobs Found</h3>
+                <p class="empty-text">Try adjusting your search filters</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = '<div class="jobs-grid">' + jobs.map(job => createJobCard(job)).join('') + '</div>';
+}
+
+// Get match badge HTML
+function getMatchBadge(matchPercentage) {
+    if (matchPercentage === 0) {
+        return '<div class="match-badge match-none">⚠️ Complete your profile</div>';
+    } else if (matchPercentage >= 70) {
+        return `<div class="match-badge match-excellent">🎯 ${matchPercentage}% Match</div>`;
+    } else if (matchPercentage >= 50) {
+        return `<div class="match-badge match-good">✨ ${matchPercentage}% Match</div>`;
+    } else if (matchPercentage >= 30) {
+        return `<div class="match-badge match-fair">💡 ${matchPercentage}% Match</div>`;
+    } else {
+        return `<div class="match-badge match-low">📊 ${matchPercentage}% Match</div>`;
+    }
+}
+
+// Create job card HTML
+function createJobCard(job) {
+    const isSaved = savedJobIds.has(job.id);
+    const jobIcon = getJobIcon(job.category);
+    const matchBadge = getMatchBadge(job.match_percentage || 0);
+    
+    return `
+        <div class="job-card">
+            ${matchBadge}
+            <button class="save-btn ${isSaved ? 'saved' : ''}" onclick="toggleSaveJob('${job.id}', this)" title="${isSaved ? 'Unsave' : 'Save'} job">
+                ${isSaved ? '❤️' : '🤍'}
+            </button>
+            <div class="job-header">
+                <div class="job-icon">${jobIcon}</div>
+                <div class="job-badge">${job.contract_time || 'Full Time'}</div>
+            </div>
+            <h3 class="job-title">${escapeHtml(job.title)}</h3>
+            <div class="job-company">${escapeHtml(job.company)}</div>
+            <div class="job-details">
+                <div class="job-detail">📍 ${escapeHtml(job.location)}</div>
+                <div class="job-detail">💰 ${job.formatted_salary}</div>
+                <div class="job-detail">⏰ ${job.days_ago}</div>
+            </div>
+            <p class="job-description">${escapeHtml(job.description)}</p>
+            <button class="apply-btn" onclick="applyToJob('${job.redirect_url}')">Apply Now →</button>
+        </div>
+    `;
+}
+
+// Get job icon based on category
+function getJobIcon(category) {
+    const icons = {
+        'IT Jobs': '💻',
+        'Engineering Jobs': '⚙️',
+        'Healthcare & Nursing Jobs': '🏥',
+        'Teaching Jobs': '📚',
+        'Sales Jobs': '💼',
+        'Marketing Jobs': '📊',
+        'Design Jobs': '🎨',
+        'Customer Services Jobs': '📞',
+        'HR & Recruitment Jobs': '👥',
+        'Finance Jobs': '💰'
+    };
+    return icons[category] || '💼';
+}
+
+// Toggle save job
+async function toggleSaveJob(jobId, button) {
+    const isSaved = savedJobIds.has(jobId);
+    
+    if (isSaved) {
+        // Unsave job
+        try {
+            const response = await fetch(`/api/jobs/unsave/${jobId}`, { method: 'DELETE' });
+            if (response.ok) {
+                savedJobIds.delete(jobId);
+                button.classList.remove('saved');
+                button.innerHTML = '🤍';
+                button.title = 'Save job';
+            }
+        } catch (error) {
+            console.error('Error unsaving job:', error);
+        }
+    } else {
+        // Save job
+        const jobCard = button.closest('.job-card');
+        const jobData = {
+            job_id: jobId,
+            title: jobCard.querySelector('.job-title').textContent,
+            company: jobCard.querySelector('.job-company').textContent,
+            location: jobCard.querySelector('.job-detail').textContent.replace('📍 ', ''),
+            description: jobCard.querySelector('.job-description').textContent
+        };
+        
+        try {
+            const response = await fetch('/api/jobs/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(jobData)
+            });
+            
+            if (response.ok) {
+                savedJobIds.add(jobId);
+                button.classList.add('saved');
+                button.innerHTML = '❤️';
+                button.title = 'Unsave job';
+            }
+        } catch (error) {
+            console.error('Error saving job:', error);
+        }
+    }
+}
+
+// Apply to job
+function applyToJob(url) {
+    window.open(url, '_blank');
+}
+
+// View saved jobs
+async function viewSavedJobs() {
+    try {
+        const response = await fetch('/api/jobs/saved');
+        const data = await response.json();
+        
+        const container = document.getElementById('jobsContainer');
+        const resultsCount = document.getElementById('resultsCount');
+        
+        resultsCount.textContent = `${data.jobs.length} Saved Jobs`;
+        
+        if (data.jobs.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">💾</div>
+                    <h3 class="empty-title">No Saved Jobs</h3>
+                    <p class="empty-text">Start saving jobs to view them here</p>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = '<div class="jobs-grid">' + data.jobs.map(job => createSavedJobCard(job)).join('') + '</div>';
+    } catch (error) {
+        console.error('Error loading saved jobs:', error);
+    }
+}
+
+// Create saved job card
+function createSavedJobCard(job) {
+    return `
+        <div class="job-card">
+            <button class="save-btn saved" onclick="toggleSaveJob('${job.id}', this)" title="Unsave job">
+                ❤️
+            </button>
+            <div class="job-header">
+                <div class="job-icon">💼</div>
+            </div>
+            <h3 class="job-title">${escapeHtml(job.title)}</h3>
+            <div class="job-company">${escapeHtml(job.company)}</div>
+            <div class="job-details">
+                <div class="job-detail">📍 ${escapeHtml(job.location)}</div>
+            </div>
+            <p class="job-description">${escapeHtml(job.description)}</p>
+            <button class="apply-btn" onclick="applyToJob('${job.redirect_url}')">Apply Now →</button>
+        </div>
+    `;
+}
+
+// Clear filters
+function clearFilters() {
+    document.getElementById('queryInput').value = '';
+    document.getElementById('locationInput').value = '';
+    document.getElementById('salaryMinInput').value = '';
+    document.getElementById('salaryMaxInput').value = '';
+    currentPage = 1;
+    searchJobs();
+}
+
+// Show error
+function showError(message) {
+    const container = document.getElementById('jobsContainer');
+    container.innerHTML = `
+        <div class="empty-state">
+            <div class="empty-icon">⚠️</div>
+            <h3 class="empty-title">Error</h3>
+            <p class="empty-text">${message}</p>
+        </div>
+    `;
+}
+
+// Escape HTML to prevent XSS
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+</script>
+{% endblock %}

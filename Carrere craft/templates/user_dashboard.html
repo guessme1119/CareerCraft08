@@ -1,0 +1,196 @@
+{% extends "base_layout.html" %}
+
+{% block title %}Dashboard - CareerCraft{% endblock %}
+
+{% block content %}
+<style>
+    .welcome-section {
+        background: white;
+        border-radius: 20px;
+        padding: 3rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .welcome-icon {
+        font-size: 5rem;
+        margin-bottom: 1rem;
+    }
+    
+    h1 {
+        color: #333;
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .role-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 8px 20px;
+        border-radius: 25px;
+        font-size: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .subtitle {
+        color: #666;
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+    
+    .feature-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        text-align: center;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(102, 126, 234, 0.3);
+    }
+    
+    .feature-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+    
+    .feature-title {
+        color: #333;
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .feature-description {
+        color: #666;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+    
+    .stats-section {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .stat-label {
+        color: #666;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+    }
+</style>
+
+<div class="welcome-section">
+    <div class="welcome-icon">{% if role == 'hr' %}👔{% else %}👤{% endif %}</div>
+    <h1>Welcome Back!</h1>
+    <span class="role-badge">{{ role|upper }} Account</span>
+    <p class="subtitle">{{ user_name }}</p>
+</div>
+
+{% if role == 'user' %}
+<div class="stats-section">
+    <div class="stat-card">
+        <div class="stat-number">0</div>
+        <div class="stat-label">Applications</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">0</div>
+        <div class="stat-label">Resumes Built</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">0</div>
+        <div class="stat-label">Jobs Saved</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">0</div>
+        <div class="stat-label">Profile Views</div>
+    </div>
+</div>
+{% endif %}
+
+<div class="features-grid">
+    {% if role == 'hr' %}
+        <a href="{{ url_for('jobs', role='hr') }}" class="feature-card">
+            <div class="feature-icon">📊</div>
+            <h3 class="feature-title">Analytics</h3>
+            <p class="feature-description">View recruitment metrics and statistics</p>
+        </a>
+        
+        <a href="{{ url_for('jobs', role='hr') }}" class="feature-card">
+            <div class="feature-icon">👥</div>
+            <h3 class="feature-title">Manage Employees</h3>
+            <p class="feature-description">Access employee records and profiles</p>
+        </a>
+        
+        <a href="{{ url_for('jobs', role='hr') }}" class="feature-card">
+            <div class="feature-icon">📝</div>
+            <h3 class="feature-title">Job Postings</h3>
+            <p class="feature-description">Create and manage job listings</p>
+        </a>
+        
+        <a href="{{ url_for('profile', role='hr') }}" class="feature-card">
+            <div class="feature-icon">📧</div>
+            <h3 class="feature-title">Communications</h3>
+            <p class="feature-description">Send announcements and updates</p>
+        </a>
+    {% else %}
+        <a href="{{ url_for('jobs', role='user') }}" class="feature-card">
+            <div class="feature-icon">🔍</div>
+            <h3 class="feature-title">Browse Jobs</h3>
+            <p class="feature-description">Discover new career opportunities</p>
+        </a>
+        
+        <a href="{{ url_for('builder', role='user') }}" class="feature-card">
+            <div class="feature-icon">📄</div>
+            <h3 class="feature-title">Resume Builder</h3>
+            <p class="feature-description">Create professional resumes easily</p>
+        </a>
+        
+        <a href="{{ url_for('analyser', role='user') }}" class="feature-card">
+            <div class="feature-icon">🎯</div>
+            <h3 class="feature-title">Resume Analyser</h3>
+            <p class="feature-description">Get AI-powered resume feedback</p>
+        </a>
+        
+        <a href="{{ url_for('profile', role='user') }}" class="feature-card">
+            <div class="feature-icon">⚙️</div>
+            <h3 class="feature-title">My Profile</h3>
+            <p class="feature-description">Manage your account settings</p>
+        </a>
+    {% endif %}
+</div>
+{% endblock %}

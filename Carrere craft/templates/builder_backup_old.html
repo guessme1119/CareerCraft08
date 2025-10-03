@@ -1,0 +1,280 @@
+{% extends "base_layout.html" %}
+
+{% block title %}Resume Builder - CareerCraft{% endblock %}
+
+{% block content %}
+<style>
+    .page-header {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+    
+    .page-title {
+        font-size: 2rem;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+    
+    .page-subtitle {
+        color: #666;
+        font-size: 1rem;
+    }
+    
+    .builder-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
+    
+    .builder-form {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+    
+    .form-section {
+        margin-bottom: 2rem;
+    }
+    
+    .section-title {
+        font-size: 1.3rem;
+        color: #333;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    label {
+        display: block;
+        color: #333;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    input, textarea {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+    }
+    
+    input:focus, textarea:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+    
+    textarea {
+        min-height: 100px;
+        resize: vertical;
+    }
+    
+    .btn-primary {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+    }
+    
+    .resume-preview {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        position: sticky;
+        top: 100px;
+    }
+    
+    .preview-title {
+        font-size: 1.3rem;
+        color: #333;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+    
+    .preview-content {
+        border: 2px dashed #e0e0e0;
+        border-radius: 10px;
+        padding: 2rem;
+        min-height: 600px;
+        background: #fafafa;
+    }
+    
+    .preview-name {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+    
+    .preview-contact {
+        color: #666;
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .preview-section {
+        margin-bottom: 1.5rem;
+    }
+    
+    .preview-section-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #667eea;
+        margin-bottom: 0.5rem;
+        border-bottom: 2px solid #667eea;
+        padding-bottom: 0.3rem;
+    }
+    
+    .preview-text {
+        color: #666;
+        line-height: 1.6;
+    }
+    
+    @media (max-width: 1024px) {
+        .builder-container {
+            grid-template-columns: 1fr;
+        }
+        
+        .resume-preview {
+            position: static;
+        }
+    }
+</style>
+
+<div class="page-header">
+    <h1 class="page-title">📄 Resume Builder</h1>
+    <p class="page-subtitle">Create a professional resume in minutes</p>
+</div>
+
+<div class="builder-container">
+    <div class="builder-form">
+        <form>
+            <div class="form-section">
+                <h3 class="section-title">👤 Personal Information</h3>
+                <div class="form-group">
+                    <label for="fullname">Full Name</label>
+                    <input type="text" id="fullname" placeholder="John Doe">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="john@example.com" value="{{ email }}" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input type="tel" id="phone" placeholder="+1 234 567 8900">
+                </div>
+                <div class="form-group">
+                    <label for="location">Location</label>
+                    <input type="text" id="location" placeholder="New York, NY">
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h3 class="section-title">💼 Professional Summary</h3>
+                <div class="form-group">
+                    <label for="summary">Summary</label>
+                    <textarea id="summary" placeholder="Brief overview of your professional background and career goals..."></textarea>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h3 class="section-title">🎓 Education</h3>
+                <div class="form-group">
+                    <label for="degree">Degree</label>
+                    <input type="text" id="degree" placeholder="Bachelor of Science in Computer Science">
+                </div>
+                <div class="form-group">
+                    <label for="school">School/University</label>
+                    <input type="text" id="school" placeholder="University Name">
+                </div>
+                <div class="form-group">
+                    <label for="graduation">Graduation Year</label>
+                    <input type="text" id="graduation" placeholder="2023">
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h3 class="section-title">💻 Skills</h3>
+                <div class="form-group">
+                    <label for="skills">Skills (comma separated)</label>
+                    <textarea id="skills" placeholder="Python, JavaScript, React, Flask, SQL..."></textarea>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h3 class="section-title">🏢 Work Experience</h3>
+                <div class="form-group">
+                    <label for="job-title">Job Title</label>
+                    <input type="text" id="job-title" placeholder="Software Engineer">
+                </div>
+                <div class="form-group">
+                    <label for="company">Company</label>
+                    <input type="text" id="company" placeholder="Company Name">
+                </div>
+                <div class="form-group">
+                    <label for="duration">Duration</label>
+                    <input type="text" id="duration" placeholder="Jan 2020 - Present">
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" placeholder="Describe your responsibilities and achievements..."></textarea>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn-primary">Generate Resume</button>
+        </form>
+    </div>
+    
+    <div class="resume-preview">
+        <h3 class="preview-title">📋 Preview</h3>
+        <div class="preview-content">
+            <div class="preview-name">Your Name</div>
+            <div class="preview-contact">
+                {{ email }} | Phone | Location
+            </div>
+            
+            <div class="preview-section">
+                <div class="preview-section-title">Professional Summary</div>
+                <p class="preview-text">Your professional summary will appear here...</p>
+            </div>
+            
+            <div class="preview-section">
+                <div class="preview-section-title">Education</div>
+                <p class="preview-text">Your education details will appear here...</p>
+            </div>
+            
+            <div class="preview-section">
+                <div class="preview-section-title">Skills</div>
+                <p class="preview-text">Your skills will appear here...</p>
+            </div>
+            
+            <div class="preview-section">
+                <div class="preview-section-title">Work Experience</div>
+                <p class="preview-text">Your work experience will appear here...</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,444 @@
+{% extends "base_layout.html" %}
+
+{% block title %}Resume Analyser - CareerCraft{% endblock %}
+
+{% block content %}
+<style>
+    .page-header {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+    
+    .page-title {
+        font-size: 2rem;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+    
+    .page-subtitle {
+        color: #666;
+        font-size: 1rem;
+    }
+    
+    .analyser-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
+    
+    .upload-section {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+    
+    .upload-area {
+        border: 3px dashed #667eea;
+        border-radius: 15px;
+        padding: 3rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: #f8f9ff;
+    }
+    
+    .upload-area:hover {
+        background: #f0f2ff;
+        border-color: #764ba2;
+    }
+    
+    .upload-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+    
+    .upload-title {
+        font-size: 1.3rem;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+    
+    .upload-text {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+    
+    .upload-btn {
+        padding: 12px 30px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+    }
+    
+    .upload-btn:hover {
+        transform: translateY(-2px);
+    }
+    
+    .analysis-section {
+        background: white;
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+    
+    .analysis-title {
+        font-size: 1.5rem;
+        color: #333;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+    
+    .score-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+        padding: 2rem;
+        text-align: center;
+        margin-bottom: 2rem;
+        color: white;
+    }
+    
+    .score-number {
+        font-size: 4rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .score-label {
+        font-size: 1.2rem;
+        opacity: 0.9;
+    }
+    
+    .feedback-section {
+        margin-bottom: 1.5rem;
+    }
+    
+    .feedback-title {
+        font-size: 1.2rem;
+        color: #333;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .feedback-item {
+        background: #f8f9fa;
+        border-left: 4px solid #667eea;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 0.8rem;
+    }
+    
+    .feedback-item.positive {
+        border-left-color: #28a745;
+    }
+    
+    .feedback-item.warning {
+        border-left-color: #ffc107;
+    }
+    
+    .feedback-item.negative {
+        border-left-color: #dc3545;
+    }
+    
+    .feedback-text {
+        color: #666;
+        line-height: 1.6;
+    }
+    
+    .suggestions-grid {
+        display: grid;
+        gap: 1rem;
+    }
+    
+    .suggestion-card {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 1rem;
+    }
+    
+    .suggestion-title {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 0.5rem;
+    }
+    
+    .suggestion-text {
+        color: #666;
+        font-size: 0.9rem;
+    }
+    
+    @media (max-width: 1024px) {
+        .analyser-container {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="page-header">
+    <h1 class="page-title">🎯 Resume Analyser</h1>
+    <p class="page-subtitle">Get AI-powered feedback on your resume</p>
+</div>
+
+<div class="analyser-container">
+    <div class="upload-section">
+        <form id="uploadForm" enctype="multipart/form-data">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📤</div>
+                <h3 class="upload-title">Upload Your Resume</h3>
+                <p class="upload-text">Drag and drop your resume here or click to browse</p>
+                <p class="upload-text" style="font-size: 0.8rem; color: #999;">Supported formats: PDF, DOCX (Max 5MB)</p>
+                <input type="file" id="resumeFile" name="resume" accept=".pdf,.docx" style="display: none;">
+                <button type="button" class="upload-btn" onclick="document.getElementById('resumeFile').click()">Choose File</button>
+                <p id="fileName" style="margin-top: 1rem; color: #667eea; font-weight: 600;"></p>
+            </div>
+            <button type="submit" class="upload-btn" style="width: 100%; margin-top: 1rem; display: none;" id="analyzeBtn">Analyze Resume</button>
+        </form>
+        
+        <div style="margin-top: 2rem;">
+            <h3 style="font-size: 1.2rem; color: #333; margin-bottom: 1rem;">✨ What We Analyze</h3>
+            <div style="display: grid; gap: 1rem;">
+                <div style="display: flex; align-items: start; gap: 0.8rem;">
+                    <span style="font-size: 1.5rem;">📝</span>
+                    <div>
+                        <div style="font-weight: 600; color: #333;">Content Quality</div>
+                        <div style="color: #666; font-size: 0.9rem;">Grammar, clarity, and professional language</div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: start; gap: 0.8rem;">
+                    <span style="font-size: 1.5rem;">🎨</span>
+                    <div>
+                        <div style="font-weight: 600; color: #333;">Formatting</div>
+                        <div style="color: #666; font-size: 0.9rem;">Layout, structure, and visual appeal</div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: start; gap: 0.8rem;">
+                    <span style="font-size: 1.5rem;">🔑</span>
+                    <div>
+                        <div style="font-weight: 600; color: #333;">Keywords</div>
+                        <div style="color: #666; font-size: 0.9rem;">Industry-relevant terms and skills</div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: start; gap: 0.8rem;">
+                    <span style="font-size: 1.5rem;">📊</span>
+                    <div>
+                        <div style="font-weight: 600; color: #333;">ATS Compatibility</div>
+                        <div style="color: #666; font-size: 0.9rem;">Applicant Tracking System optimization</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="analysis-section" id="resultsSection">
+        <h3 class="analysis-title">📊 Analysis Results</h3>
+        
+        <div id="loadingSpinner" style="display: none; text-align: center; padding: 3rem;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">⏳</div>
+            <p style="color: #667eea; font-size: 1.2rem;">Analyzing your resume...</p>
+        </div>
+        
+        <div id="resultsContent" style="display: none;">
+            <div class="score-card">
+                <div class="score-number" id="scoreNumber">--/100</div>
+                <div class="score-label">Overall Score</div>
+            </div>
+            
+            <div class="feedback-section">
+                <h4 class="feedback-title">📋 Resume Sections</h4>
+                <div id="sectionsContent"></div>
+            </div>
+            
+            <div class="feedback-section">
+                <h4 class="feedback-title">🔑 Skills Found</h4>
+                <div id="skillsContent"></div>
+            </div>
+            
+            <div class="feedback-section">
+                <h4 class="feedback-title">📏 Format Analysis</h4>
+                <div id="formatContent"></div>
+            </div>
+            
+            <div class="feedback-section">
+                <h4 class="feedback-title">💡 Suggestions</h4>
+                <div id="suggestionsContent"></div>
+            </div>
+        </div>
+        
+        <div id="placeholderContent">
+            <div style="text-align: center; padding: 3rem; color: #999;">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">📄</div>
+                <p style="font-size: 1.2rem;">Upload a resume to see analysis results</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const uploadForm = document.getElementById('uploadForm');
+    const resumeFile = document.getElementById('resumeFile');
+    const fileName = document.getElementById('fileName');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const uploadArea = document.getElementById('uploadArea');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const resultsContent = document.getElementById('resultsContent');
+    const placeholderContent = document.getElementById('placeholderContent');
+
+    // File selection handler
+    resumeFile.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            fileName.textContent = `Selected: ${file.name}`;
+            analyzeBtn.style.display = 'block';
+        }
+    });
+
+    // Drag and drop handlers
+    uploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        uploadArea.style.background = '#f0f2ff';
+        uploadArea.style.borderColor = '#764ba2';
+    });
+
+    uploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        uploadArea.style.background = '#f8f9ff';
+        uploadArea.style.borderColor = '#667eea';
+    });
+
+    uploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        uploadArea.style.background = '#f8f9ff';
+        uploadArea.style.borderColor = '#667eea';
+        
+        const file = e.dataTransfer.files[0];
+        if (file && (file.name.endsWith('.pdf') || file.name.endsWith('.docx'))) {
+            resumeFile.files = e.dataTransfer.files;
+            fileName.textContent = `Selected: ${file.name}`;
+            analyzeBtn.style.display = 'block';
+        } else {
+            alert('Please upload a PDF or DOCX file');
+        }
+    });
+
+    // Form submission handler
+    uploadForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const file = resumeFile.files[0];
+        if (!file) {
+            alert('Please select a file');
+            return;
+        }
+
+        // Show loading spinner
+        placeholderContent.style.display = 'none';
+        resultsContent.style.display = 'none';
+        loadingSpinner.style.display = 'block';
+
+        const formData = new FormData();
+        formData.append('resume', file);
+
+        try {
+            const response = await fetch(window.location.href, {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                displayResults(data);
+            } else {
+                alert(data.error || 'Error analyzing resume');
+                placeholderContent.style.display = 'block';
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error uploading file. Please try again.');
+            placeholderContent.style.display = 'block';
+        } finally {
+            loadingSpinner.style.display = 'none';
+        }
+    });
+
+    function displayResults(data) {
+        // Update score
+        document.getElementById('scoreNumber').textContent = `${data.score}/100`;
+
+        // Display sections
+        const sectionsContent = document.getElementById('sectionsContent');
+        sectionsContent.innerHTML = '';
+        for (const [section, found] of Object.entries(data.sections)) {
+            const item = document.createElement('div');
+            item.className = `feedback-item ${found ? 'positive' : 'negative'}`;
+            item.innerHTML = `<p class="feedback-text">${found ? '✅' : '❌'} ${section}: ${found ? 'Found' : 'Missing'}</p>`;
+            sectionsContent.appendChild(item);
+        }
+
+        // Display skills
+        const skillsContent = document.getElementById('skillsContent');
+        if (data.skills_found.length > 0) {
+            skillsContent.innerHTML = `
+                <div class="feedback-item positive">
+                    <p class="feedback-text">Found ${data.skills_count} skills: ${data.skills_found.join(', ')}</p>
+                </div>
+            `;
+        } else {
+            skillsContent.innerHTML = `
+                <div class="feedback-item warning">
+                    <p class="feedback-text">No technical skills detected. Consider adding relevant skills.</p>
+                </div>
+            `;
+        }
+
+        // Display format feedback
+        const formatContent = document.getElementById('formatContent');
+        formatContent.innerHTML = '';
+        data.format_feedback.forEach(feedback => {
+            const item = document.createElement('div');
+            item.className = 'feedback-item';
+            item.innerHTML = `<p class="feedback-text">📝 ${feedback} (Word count: ${data.word_count})</p>`;
+            formatContent.appendChild(item);
+        });
+
+        // Display suggestions
+        const suggestionsContent = document.getElementById('suggestionsContent');
+        suggestionsContent.innerHTML = '';
+        if (data.suggestions.length > 0) {
+            data.suggestions.forEach(suggestion => {
+                const card = document.createElement('div');
+                card.className = 'suggestion-card';
+                card.innerHTML = `
+                    <div class="suggestion-title">💡 Recommendation</div>
+                    <p class="suggestion-text">${suggestion}</p>
+                `;
+                suggestionsContent.appendChild(card);
+            });
+        } else {
+            suggestionsContent.innerHTML = `
+                <div class="feedback-item positive">
+                    <p class="feedback-text">Great job! Your resume looks comprehensive.</p>
+                </div>
+            `;
+        }
+
+        // Show results
+        resultsContent.style.display = 'block';
+        
+        // Scroll to results
+        document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+</script>
+{% endblock %}
